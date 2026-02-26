@@ -4,6 +4,8 @@ import {
   LogOut,
   LayoutTemplate,
   Crown,
+  Menu,
+  X,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import ResumeThumbnail from "../components/ResumeThumbnail";
@@ -11,7 +13,7 @@ import { Link, useNavigate } from "react-router-dom";
 import logo from "../logos/logo.png";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { auth } from "../firebase/firebase";
+import { auth, db } from "../firebase/firebase";
 import {
   collection,
   getDocs,
@@ -21,7 +23,6 @@ import {
   where,
   getDoc,
 } from "firebase/firestore";
-import { db } from "../firebase/firebase";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ const Dashboard = () => {
   const [isProUser, setIsProUser] = useState(false);
   const [loading, setLoading] = useState(true);
   const [resumes, setResumes] = useState([]);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -39,10 +41,7 @@ const Dashboard = () => {
 
       const userSnap = await getDoc(doc(db, "users", currentUser.uid));
       if (userSnap.exists()) {
-
-        if (userSnap.exists()) {
         setIsProUser(userSnap.data().pro === true);
-      }
       }
 
       const q = query(
@@ -85,22 +84,41 @@ const Dashboard = () => {
     );
   }
 
-
-
   return (
     <div
-      className={`min-h-screen flex transition-all duration-500 ${
+      className={`min-h-screen flex ${
         isProUser
           ? "bg-gradient-to-br from-black via-gray-900 to-gray-800 text-white"
           : "bg-gray-50"
       }`}
     >
+      {/* ================= MOBILE TOPBAR ================= */}
+      <div className="md:hidden fixed top-0 left-0 right-0 bg-white shadow z-50 flex items-center justify-between px-4 py-3">
+        <div className="flex items-center gap-2">
+          <img src={logo} className="w-8" alt="logo" />
+          <span className="font-bold">ZenithCV</span>
+        </div>
+        <button onClick={() => setSidebarOpen(true)}>
+          <Menu size={24} />
+        </button>
+      </div>
+
+      {/* ================= SIDEBAR ================= */}
       <aside
-        className={`w-64 border-r ${
-          isProUser ? "bg-black/40 border-gray-700" : "bg-white"
-        }`}
+        className={`fixed md:static top-0 left-0 h-full w-64 z-50 transform transition-transform duration-300 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0 ${
+          isProUser ? "bg-black/90 border-gray-700" : "bg-white"
+        } border-r`}
       >
         <div className="h-full flex flex-col">
+          {/* Close button (mobile) */}
+          <div className="md:hidden flex justify-end p-4">
+            <button onClick={() => setSidebarOpen(false)}>
+              <X size={22} />
+            </button>
+          </div>
+
           <div className="px-6 py-6 border-b flex items-center gap-2">
             <img src={logo} className="w-9" alt="logo" />
             <span className="font-bold text-lg">ZenithCV</span>
@@ -108,14 +126,20 @@ const Dashboard = () => {
 
           <nav className="flex-1 px-6 py-6 space-y-6 text-sm">
             <button
-              onClick={() => navigate("/templates")}
+              onClick={() => {
+                navigate("/templates");
+                setSidebarOpen(false);
+              }}
               className="flex items-center gap-2 hover:text-blue-500"
             >
               <LayoutTemplate size={16} /> Templates
             </button>
 
             <button
-              onClick={() => navigate("/profile")}
+              onClick={() => {
+                navigate("/profile");
+                setSidebarOpen(false);
+              }}
               className="flex items-center gap-2 hover:text-blue-500"
             >
               <Pencil size={16} /> Profile
@@ -131,65 +155,40 @@ const Dashboard = () => {
         </div>
       </aside>
 
+      {/* ================= MAIN ================= */}
+      <main className="flex-1 px-4 md:px-8 py-24 md:py-10">
 
-      <main className="flex-1 px-8 py-10">
-
-        <div className="flex justify-between items-center mb-12">
-          <div className="flex items-center gap-5">
-            <h1 className="text-3xl font-bold">
+        {/* HEADER */}
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6 mb-10">
+          <div className="flex items-center gap-4 flex-wrap">
+            <h1 className="text-2xl md:text-3xl font-bold">
               Welcome back 👋
             </h1>
 
-            {isProUser  && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="relative"
-              >
-                <motion.div
-                  animate={{
-                    opacity: [0.5, 0.9, 0.5],
-                    scale: [1, 1.1, 1],
-                  }}
-                  transition={{ repeat: Infinity, duration: 2 }}
-                  className="absolute inset-0 blur-xl rounded-full bg-yellow-400"
-                />
-
-                <div className="relative flex items-center gap-2 px-5 py-2 rounded-full 
-                  bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-500 
-                  text-black font-bold text-sm shadow-2xl border border-yellow-300">
-                  <motion.div
-                    animate={{ rotate: [-10, 10, -10] }}
-                    transition={{ repeat: Infinity, duration: 2 }}
-                  >
-                    <Crown size={16} />
-                  </motion.div>
-                  PRO MEMBER
-                </div>
-              </motion.div>
+            {isProUser && (
+              <div className="flex items-center gap-2 px-4 py-1 rounded-full bg-yellow-400 text-black text-xs font-bold">
+                <Crown size={14} />
+                PRO MEMBER
+              </div>
             )}
           </div>
 
-          <motion.button
-            whileHover={{ scale: 1.05 }}
+          <button
             onClick={() => navigate("/templates")}
-            className={`px-6 py-3 rounded-xl font-semibold transition ${
+            className={`px-5 py-3 rounded-xl font-semibold transition w-full md:w-auto ${
               isProUser
-                ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-black shadow-lg"
+                ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-black"
                 : "bg-black text-white"
             }`}
           >
             <Plus size={16} className="inline mr-2" />
             Create Resume
-          </motion.button>
+          </button>
         </div>
 
+        {/* UPGRADE CARD */}
         {!isProUser && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl p-6 mb-10 shadow-lg flex justify-between items-center"
-          >
+          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl p-6 mb-10 shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <h2 className="text-lg font-semibold">
                 Unlock Premium Templates 🚀
@@ -201,21 +200,25 @@ const Dashboard = () => {
 
             <button
               onClick={() => navigate("/upgrade")}
-              className="bg-white text-black px-6 py-3 rounded-xl font-semibold hover:scale-105 transition"
+              className="bg-white text-black px-6 py-3 rounded-xl font-semibold w-full md:w-auto"
             >
               Upgrade
             </button>
-          </motion.div>
+          </div>
         )}
 
-   
-        <h2 className="text-xl font-semibold mb-6">
+        {/* RESUMES */}
+        <h2 className="text-lg md:text-xl font-semibold mb-6">
           Your Saved Resumes
         </h2>
 
         {resumes.length === 0 ? (
-          <div className={` rounded-2xl ${isProUser ? 'bg-gray-900' : 'bg-white'} border border-dashed border-gray-300 p-12 text-center`}>
-            <h3 className={`${isProUser ? 'text-gray-500' : 'text-white'}text-lg font-semibold mb-2`}>
+          <div
+            className={`rounded-2xl ${
+              isProUser ? "bg-gray-900" : "bg-white"
+            } border border-dashed border-gray-300 p-10 text-center`}
+          >
+            <h3 className="text-lg font-semibold mb-2">
               No resumes yet
             </h3>
             <p className="text-gray-500 mb-6">
@@ -223,24 +226,23 @@ const Dashboard = () => {
             </p>
             <Link
               to="/templates"
-              className="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition"
+              className="bg-blue-600 text-white px-6 py-3 rounded-xl"
             >
               Create Resume
             </Link>
           </div>
         ) : (
-          <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {resumes.map((resume) => (
-              <motion.div
+              <div
                 key={resume.id}
-                whileHover={{ y: -6 }}
                 className={`rounded-2xl overflow-hidden transition ${
                   isProUser
-                    ? "bg-gradient-to-br from-gray-800 to-gray-900 border border-yellow-400 shadow-[0_0_25px_rgba(255,215,0,0.3)]"
-                    : "bg-white shadow-md hover:shadow-xl"
+                    ? "bg-gray-900 border border-yellow-400"
+                    : "bg-white shadow-md"
                 }`}
               >
-                <div className={`p-4 bg-gray-50`}>
+                <div className="p-4 bg-gray-50">
                   <ResumeThumbnail resume={resume} />
                 </div>
 
@@ -255,20 +257,20 @@ const Dashboard = () => {
                       onClick={() =>
                         handleEdit(resume.id, resume.templateId)
                       }
-                      className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition text-sm"
+                      className="flex-1 bg-blue-600 text-white py-2 rounded-lg text-sm"
                     >
                       Edit
                     </button>
 
                     <button
                       onClick={() => handleDelete(resume.id)}
-                      className="flex-1 bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition text-sm"
+                      className="flex-1 bg-red-500 text-white py-2 rounded-lg text-sm"
                     >
                       Delete
                     </button>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         )}
