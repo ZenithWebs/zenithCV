@@ -5,7 +5,7 @@ import Login from "./assets/pages/Login";
 import Register from "./assets/pages/Register";
 import ResumeBuilder from "./assets/pages/ResumeBuilder";
 import TemplateSelection from "./assets/pages/TemplateSelection";
-import Profile from "./assets/pages/profile";
+import Profile from "./assets/pages/Profile";
 import Upgrade from "./assets/pages/Upgrade";
 import ProtectedRoute from "./assets/components/ProtectedRoutes";
 import { useAuth } from "./assets/context/AuthContext";
