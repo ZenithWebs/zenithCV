@@ -35,7 +35,7 @@ const Login = () => {
         uid: user.uid,
         name: user.displayName || "",
         email: user.email,
-        pro: true, // default plan
+        pro: false, // default plan
         createdAt: new Date(),
       });
     }
@@ -178,4 +178,5 @@ const Login = () => {
 };
 
 export default Login;
+
 
