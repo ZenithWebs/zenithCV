@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import {Eye, EyeClosed} from 'lucide-react'
+import { Eye, EyeClosed } from "lucide-react";
 import {
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
 } from "firebase/auth";
-import { auth } from "../firebase/firebase";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import { auth, db } from "../firebase/firebase";
 
 const Login = () => {
   const [form, setForm] = useState({
@@ -17,55 +18,83 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
   const navigate = useNavigate();
   const provider = new GoogleAuthProvider();
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
+  // 🔥 Save user to Firestore
+  const saveUserToFirestore = async (user) => {
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+
+    // If user does NOT exist, create document
+    if (!userSnap.exists()) {
+      await setDoc(userRef, {
+        uid: user.uid,
+        name: user.displayName || "",
+        email: user.email,
+        plan: "free", // default plan
+        createdAt: new Date(),
+      });
+    }
+  };
+
+  // Email login
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
     try {
       setLoading(true);
-      await signInWithEmailAndPassword(
+
+      const userCredential = await signInWithEmailAndPassword(
         auth,
         form.email,
         form.password
       );
+
+      await saveUserToFirestore(userCredential.user);
+
       navigate("/dashboard");
-    } catch {
+    } catch (err) {
       setError("Invalid email or password");
     } finally {
       setLoading(false);
     }
   };
 
+  // 🔥 Google login with Firestore save
   const handleGoogle = async () => {
     try {
       setLoading(true);
-      await signInWithPopup(auth, provider);
+
+      const result = await signInWithPopup(auth, provider);
+
+      await saveUserToFirestore(result.user);
+
       navigate("/dashboard");
-    } catch {
+    } catch (err) {
+      console.error(err);
       setError("Google sign-in failed");
     } finally {
       setLoading(false);
     }
   };
-    
-    const handleShowPassword = () => {
-  setShowPassword(prev => !prev);
-};
+
+  const handleShowPassword = () => {
+    setShowPassword((prev) => !prev);
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 px-4">
-
       <div className="bg-white/90 backdrop-blur-xl shadow-2xl rounded-3xl p-8 w-full max-w-md">
-
         <h2 className="text-3xl font-bold text-center mb-2">
           Welcome Back
         </h2>
+
         <p className="text-gray-500 text-center mb-6">
           Login to continue building resumes
         </p>
@@ -77,7 +106,6 @@ const Login = () => {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-
           <input
             name="email"
             type="email"
@@ -86,25 +114,28 @@ const Login = () => {
             className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
             required
           />
+
           <div className="relative flex">
             <input
-            id='input'
-            name="password"
-            type={showPassword ? "text" : "password"}
-            onChange={handleChange}
-            placeholder="Password"
-            className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
-            required
-          />
-          <span onClick={handleShowPassword} className="absolute z-1 top-1/2 -translate-y-1/2 cursor-pointer right-2 flex">
-            {showPassword ? 
-          <Eye size={20}/> 
-          : 
-          <EyeClosed size={20}/>}
-          
-          </span> 
+              name="password"
+              type={showPassword ? "text" : "password"}
+              onChange={handleChange}
+              placeholder="Password"
+              className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
+              required
+            />
+
+            <span
+              onClick={handleShowPassword}
+              className="absolute top-1/2 -translate-y-1/2 cursor-pointer right-3"
+            >
+              {showPassword ? (
+                <Eye size={20} />
+              ) : (
+                <EyeClosed size={20} />
+              )}
+            </span>
           </div>
-          
 
           <button
             type="submit"
