@@ -16,14 +16,14 @@ import References from "../components/form/References";
 
 import TemplateCreative from "../components/templates/TemplateCreative";
 import TemplateElegant from "../components/templates/TemplateElegant";
-import TemplateCorporatePro from './../components/templates/TemplateCorporatePro';
+import TemplateCorporatePro from "../components/templates/TemplateCorporatePro";
 
 import logo from "../logos/logo.png";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Save } from "lucide-react";
 
-import { auth } from "../firebase/firebase";
-import { db } from "../firebase/firebase";
-import { collection,
+import { auth, db } from "../firebase/firebase";
+import {
+  collection,
   addDoc,
   doc,
   updateDoc,
@@ -42,8 +42,8 @@ const ResumeBuilder = () => {
   const [savedMessage, setSavedMessage] = useState("");
   const [activeTab, setActiveTab] = useState("form");
   const [formKey, setFormKey] = useState(0);
-  const { resumeData, setResumeData } = useResume();
 
+  const { resumeData, setResumeData } = useResume();
 
   const calculateProgress = () => {
     let total = 0;
@@ -67,31 +67,25 @@ const ResumeBuilder = () => {
     return total === 0 ? 0 : Math.round((filled / total) * 100);
   };
 
-
   useEffect(() => {
     const fetchResume = async () => {
       if (!resumeId) return;
-
       try {
         const resumeRef = doc(db, "resumes", resumeId);
         const resumeSnap = await getDoc(resumeRef);
-
         if (resumeSnap.exists()) {
           setResumeData(resumeSnap.data());
         }
       } catch (error) {
-        console.error("Error loading resume:", error);
+        console.error(error);
       }
     };
-
     fetchResume();
   }, [resumeId, setResumeData]);
-
 
   const saveResume = async () => {
     try {
       const user = auth.currentUser;
-
       if (!user) {
         setSavedMessage("You must be logged in ❌");
         return;
@@ -105,14 +99,12 @@ const ResumeBuilder = () => {
       };
 
       if (resumeId) {
-        const resumeRef = doc(db, "resumes", resumeId);
-        await updateDoc(resumeRef, resumePayload);
+        await updateDoc(doc(db, "resumes", resumeId), resumePayload);
       } else {
         const docRef = await addDoc(collection(db, "resumes"), {
           ...resumePayload,
           createdAt: serverTimestamp(),
         });
-
         navigate(
           `/resumebuilder?template=${selectedTemplate}&resumeId=${docRef.id}`
         );
@@ -121,46 +113,38 @@ const ResumeBuilder = () => {
       setSavedMessage("Resume saved successfully ☁️✅");
       setTimeout(() => setSavedMessage(""), 2500);
     } catch (error) {
-      console.error("Error saving resume:", error);
+      console.error(error);
       setSavedMessage("Failed to save ❌");
     }
   };
 
-    const colorOptions = [
-    "#1f4e79",
-    "#2c3e50",
-    "#8b0000", 
-    "#0f766e",
-    "#4b5563", 
-  ];
- 
   const resetResume = () => {
-  setResumeData({
-    personalInfo: {},
-    professionalSummary: "",
-    experience: [],
-    education: [],
-    skills: [],
-    projects: [],
-    certifications: [],
-    languages: [],
-    references: [],
-  });
+    setResumeData({
+      personalInfo: {},
+      professionalSummary: "",
+      experience: [],
+      education: [],
+      skills: [],
+      projects: [],
+      certifications: [],
+      languages: [],
+      references: [],
+    });
+    setFormKey((prev) => prev + 1);
+  };
 
-  setFormKey(prev => prev + 1); 
-};
-  
   const renderTemplate = () => {
     switch (selectedTemplate) {
-      case "elegant":
-        return <TemplateElegant data={resumeData} />;
-      case "corporate-pro":
-        return (
-          <TemplateCorporatePro data={resumeData} accentColor={themeColor}/>
-        );
       case "creative":
         return (
           <TemplateCreative data={resumeData} themeColor={themeColor} />
+        );
+      case "corporate-pro":
+        return (
+          <TemplateCorporatePro
+            data={resumeData}
+            accentColor={themeColor}
+          />
         );
       default:
         return <TemplateElegant data={resumeData} />;
@@ -169,39 +153,32 @@ const ResumeBuilder = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
-
-      <header className="bg-white border-b px-4 sm:px-8 py-4 
-      flex flex-col sm:flex-row justify-between items-center 
-      gap-4 sticky top-0 z-30 shadow-sm">
-
+      <header className="bg-white border-b px-4 sm:px-8 py-4 flex flex-col sm:flex-row justify-between items-center gap-4 sticky top-0 z-30 shadow-sm">
         <div
           onClick={() => navigate(-1)}
           className="flex items-center gap-3 cursor-pointer"
         >
           <ArrowLeft size={20} />
-          <img src={logo} className="w-10" alt="logo" />
+          <img src={logo} className="w-9" alt="logo" />
           <span className="text-lg font-semibold">ZenithCV</span>
         </div>
 
-        <div className="flex flex-wrap items-center justify-center sm:justify-end gap-3">
+        <div className="flex flex-wrap gap-3 justify-center sm:justify-end">
           <button
             onClick={saveResume}
-            className="px-4 py-2 text-sm bg-black text-white rounded-lg hover:opacity-90 transition"
+            className="px-4 py-2 text-sm bg-black text-white rounded-lg"
           >
-            Save Resume
+            Save
           </button>
-
           <button
             onClick={resetResume}
-            className="px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:opacity-90 transition"
+            className="px-4 py-2 text-sm bg-red-500 text-white rounded-lg"
           >
             Reset
           </button>
-
           <ExportPDF />
         </div>
       </header>
-
 
       {savedMessage && (
         <div className="bg-green-100 text-green-700 text-center py-2 text-sm">
@@ -233,18 +210,16 @@ const ResumeBuilder = () => {
         </button>
       </div>
 
-
       <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
-
         <div
-          className={`w-full lg:w-1/2 bg-white border-r overflow-y-auto 
-          lg:h-[calc(100vh-80px)] 
-          ${activeTab === "preview" ? "hidden lg:block" : "block"}`}
+          className={`w-full lg:w-1/2 bg-white border-r overflow-y-auto ${
+            activeTab === "preview" ? "hidden lg:block" : "block"
+          }`}
         >
           <div className="px-4 sm:px-8 pt-4">
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div
-                className={`h-2 rounded-full transition-all duration-300 ${
+                className={`h-2 rounded-full ${
                   calculateProgress() < 40
                     ? "bg-red-500"
                     : calculateProgress() < 75
@@ -252,7 +227,7 @@ const ResumeBuilder = () => {
                     : "bg-green-500"
                 }`}
                 style={{ width: `${calculateProgress()}%` }}
-              ></div>
+              />
             </div>
             <p className="text-sm text-gray-600 mt-2">
               {calculateProgress()}% Completed
@@ -260,7 +235,7 @@ const ResumeBuilder = () => {
           </div>
 
           <div className="max-w-3xl mx-auto px-4 sm:px-8 py-8 space-y-10">
-            <motion.div  key={formKey} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <motion.div key={formKey} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <PersonalInfo data={resumeData.personalInfo} setResumeData={setResumeData} />
               <ProfessionalSummary data={resumeData.professionalSummary} setResumeData={setResumeData} />
               <Experience data={resumeData.experience} setResumeData={setResumeData} />
@@ -275,58 +250,33 @@ const ResumeBuilder = () => {
         </div>
 
         <div
-          className={`w-full lg:w-1/2 bg-gray-100 flex flex-col items-center
-          lg:h-[calc(100vh-80px)] lg:overflow-y-auto
-          ${activeTab === "form" ? "hidden lg:flex" : "flex"}`}
+          className={`w-full lg:w-1/2 bg-gray-100 flex flex-col items-center overflow-y-auto ${
+            activeTab === "form" ? "hidden lg:flex" : "flex"
+          }`}
         >
-          {selectedTemplate === 'corporate-pro' && (
-            <div className="flex gap-2 bg-white p-2 rounded-xl shadow-md mt-4">
-            {colorOptions.map((color, index) => (
-            <button
-              key={index}
-              onClick={() => setThemeColor(color)}
-              className="w-6 h-6 rounded-full border-2"
-              style={{
-                backgroundColor: color,
-                borderColor: themeColor === color ? "black" : "#ccc",
-              }}
-            />
-          ))}
-          </div>
-          )}
-
-          {selectedTemplate === "creative" && (
-            <div className="flex gap-2 bg-white p-2 rounded-xl shadow-md mt-4">
-              {["blue", "green", "yellow", "purple", "red", "gray"].map(
-                (color, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setThemeColor(color)}
-                    className={`w-6 h-6 rounded-full border-2 ${
-                      themeColor === color
-                        ? "border-black"
-                        : "border-gray-300"
-                    }`}
-                    style={{ backgroundColor: color }}
-                  />
-                )
-              )}
-            </div>
-          )}
-
-          <div className="w-full flex justify-center p-6">
+          <div className="w-full flex justify-center px-3 sm:px-6 py-6">
             <motion.div
               key={selectedTemplate}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3 }}
-              className="w-full max-w-[800px]"
+              className="w-full max-w-full sm:max-w-[700px] lg:max-w-[800px] bg-white shadow-md rounded-md overflow-hidden scale-[0.95] sm:scale-100"
             >
               {renderTemplate()}
             </motion.div>
           </div>
         </div>
       </div>
+
+      <motion.button
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        onClick={saveResume}
+        className="lg:hidden fixed bottom-6 right-6 bg-black text-white p-4 rounded-full shadow-2xl active:scale-95 transition z-50"
+      >
+        <Save size={22} />
+      </motion.button>
     </div>
   );
 };
