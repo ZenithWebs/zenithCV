@@ -38,7 +38,7 @@ export default function Navbar() {
           <a href="#example">Examples</a>
           <a href="#contact">Contact</a>
 
-          <Link to={'/login'} className="px-6 py-2 bg-blue-900 text-white rounded-2xl hover:scale-105 hover:shadow-lg transition-all duration-300">
+          <Link to={'/dashboard'} className="px-6 py-2 bg-blue-900 text-white rounded-2xl hover:scale-105 hover:shadow-lg transition-all duration-300">
             Start Free
           </Link>
         </div>

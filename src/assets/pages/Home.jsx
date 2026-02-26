@@ -37,7 +37,7 @@ export default function Home() {
             </p>
 
             <div className="mt-8 flex gap-4">
-              <Link to={'/login'} className="px-8 py-4 bg-blue-900 text-white rounded-2xl shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-300">
+              <Link to={'/dashboard'} className="px-8 py-4 bg-blue-900 text-white rounded-2xl shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-300">
                 Start Free
               </Link>
 

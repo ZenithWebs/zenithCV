@@ -4,27 +4,26 @@ import { useResume } from "../../context/ResumeContext";
 const colorMap = {
   blue: "bg-blue-500",
   green: "bg-emerald-500",
-  yellow: 'bg-yellow-500',
+  yellow: "bg-yellow-500",
   purple: "bg-purple-700",
   red: "bg-red-500",
   gray: "bg-gray-800",
 };
 
 const TemplateCreative = ({ themeColor = "blue" }) => {
-  const { resumeData } = useResume();
+  const { resumeData = {} } = useResume();
 
   const {
-    personalInfo,
-    professionalSummary,
-    experience,
-    education,
-    skills,
-    projects,
-    certifications,
-    languages,
-    references,
+    personalInfo = {},
+    professionalSummary = "",
+    experience = [],
+    education = [],
+    skills = [],
+    projects = [],
+    certifications = [],
+    languages = [],
+    references = [],
   } = resumeData;
-
 
   const dummyExperience = [
     {
@@ -62,131 +61,170 @@ const TemplateCreative = ({ themeColor = "blue" }) => {
     {
       id: "1",
       name: "Jane Smith",
-      relationship: "Manager",
+      company: "Tech Company Ltd",
+      position: "Manager",
       contact: "janesmith@email.com",
     },
   ];
 
   return (
-    <div className="w-[850px] min-h-[1100px] bg-white shadow-xl flex text-sm m-4 rounded-lg overflow-hidden">
-      <div className={`w-1/3 text-white p-8 flex flex-col gap-6 ${colorMap[themeColor]}`}>
-        <h1 className="text-3xl font-bold mb-2">
-          {personalInfo.fullName || "John Doe"}
-        </h1>
-        <div className="text-xs opacity-90 space-y-1">
-          <p>{personalInfo.email || "johndoe@email.com"}</p>
-          <p>{personalInfo.phone || "+234 800 000 0000"}</p>
-          <p>{personalInfo.location || "Lagos, Nigeria"}</p>
-          <p>{personalInfo.linkedin || "linkedin.com/in/johndoe"}</p>
-          <p>{personalInfo.portfolio || "www.johndoe.com"}</p>
+    <div className="flex justify-center px-4 py-8 bg-gray-100">
+      <div className="w-full max-w-5xl bg-white shadow-xl rounded-xl overflow-hidden flex flex-col md:flex-row">
+
+        {/* Sidebar */}
+        <div
+          className={`w-full md:w-1/3 text-white p-6 md:p-8 flex flex-col gap-6 ${colorMap[themeColor]}`}
+        >
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold mb-2">
+              {personalInfo.fullName || "John Doe"}
+            </h1>
+            <div className="text-xs md:text-sm opacity-90 space-y-1">
+              <p>{personalInfo.email || "johndoe@email.com"}</p>
+              <p>{personalInfo.phone || "+234 800 000 0000"}</p>
+              <p>{personalInfo.location || "Lagos, Nigeria"}</p>
+              <p>{personalInfo.linkedin || "linkedin.com/in/johndoe"}</p>
+              <p>{personalInfo.portfolio || "www.johndoe.com"}</p>
+            </div>
+          </div>
+
+          {/* Skills */}
+          <div>
+            <h2 className="font-semibold uppercase text-xs mb-2 tracking-wider">
+              Skills
+            </h2>
+            <ul className="space-y-1 text-sm">
+              {(skills.length ? skills : ["React", "JavaScript", "Tailwind CSS"]).map(
+                (skill, i) => (
+                  <li key={i}>• {skill}</li>
+                )
+              )}
+            </ul>
+          </div>
+
+          {/* Languages */}
+          <div>
+            <h2 className="font-semibold uppercase text-xs mb-2 tracking-wider">
+              Languages
+            </h2>
+            <ul className="space-y-1 text-sm">
+              {(languages.length
+                ? languages
+                : [{ language: "English", level: "Fluent" }]
+              ).map((lang, i) => (
+                <li key={i}>
+                  {lang.language} – {lang.level}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Certifications */}
+          <div>
+            <h2 className="font-semibold uppercase text-xs mb-2 tracking-wider">
+              Certifications
+            </h2>
+            <ul className="space-y-2 text-sm">
+              {(certifications.length
+                ? certifications
+                : [
+                    {
+                      name: "Google UX Design",
+                      organization: "Google",
+                      year: "2023",
+                    },
+                  ]
+              ).map((cert, i) => (
+                <li key={i}>
+                  <p className="font-medium">{cert.name}</p>
+                  <p className="text-xs opacity-80">
+                    {cert.organization} ({cert.year})
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
-        <div>
-          <h2 className="font-semibold uppercase text-xs mb-2">Skills</h2>
-          <ul className="space-y-1">
-            {(skills.length > 0 ? skills : ["React", "JavaScript", "Tailwind CSS"]).map(
-              (skill, i) => (
-                <li key={i}>• {skill}</li>
-              )
-            )}
-          </ul>
-        </div>
+        {/* Main Content */}
+        <div className="w-full md:w-2/3 p-6 md:p-8 space-y-8">
 
-        <div>
-          <h2 className="font-semibold uppercase text-xs mb-2">Languages</h2>
-          <ul className="space-y-1">
-            {(languages.length > 0
-              ? languages
-              : [{ language: "English", level: "Fluent" }]
-            ).map((lang, i) => (
-              <li key={i}>
-                {lang.language} – {lang.level}
-              </li>
-            ))}
-          </ul>
-        </div>
+          {/* Summary */}
+          <div>
+            <h2 className="font-semibold uppercase text-xs mb-2 text-gray-700 tracking-wider">
+              Professional Summary
+            </h2>
+            <p className="text-gray-700 text-sm leading-relaxed">
+              {professionalSummary ||
+                "Passionate and results-driven professional with experience building scalable applications and delivering high-quality digital products."}
+            </p>
+          </div>
 
-        <div>
-          <h2 className="font-semibold uppercase text-xs mb-2">Certifications</h2>
-          <ul className="space-y-2">
-            {(certifications.length > 0
-              ? certifications
-              : [
-                  {
-                    name: "Google UX Design",
-                    organization: "Google",
-                    year: "2023",
-                  },
-                ]
-            ).map((cert, i) => (
-              <li key={i}>
-                <p className="font-medium">{cert.name}</p>
-                <p className="text-xs opacity-80">
-                  {cert.organization} ({cert.year})
+          {/* Experience */}
+          <div>
+            <h2 className="font-semibold uppercase text-xs mb-2 text-gray-700 tracking-wider">
+              Experience
+            </h2>
+            {(experience.length ? experience : dummyExperience).map((exp) => (
+              <div key={exp.id} className="mb-4">
+                <p className="font-semibold text-sm">
+                  {exp.jobTitle} – {exp.company}
                 </p>
-              </li>
+                <p className="text-xs text-gray-500">
+                  {exp.startDate} - {exp.endDate}
+                </p>
+                <p className="mt-1 text-sm">{exp.description}</p>
+              </div>
             ))}
-          </ul>
-        </div>
-      </div>
+          </div>
 
-      <div className="w-2/3 p-8 space-y-8">
+          {/* Education */}
+          <div>
+            <h2 className="font-semibold uppercase text-xs mb-2 text-gray-700 tracking-wider">
+              Education
+            </h2>
+            {(education.length ? education : dummyEducation).map((edu) => (
+              <div key={edu.id} className="mb-3">
+                <p className="font-semibold text-sm">
+                  {edu.degree} – {edu.school}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {edu.startDate} - {edu.endDate}
+                </p>
+              </div>
+            ))}
+          </div>
 
-        <div>
-          <h2 className="font-semibold uppercase text-xs mb-2 text-gray-700">
-            Professional Summary
-          </h2>
-          <p className="text-gray-700">
-            {professionalSummary ||
-              "Passionate and results-driven professional with experience building scalable applications and delivering high-quality digital products."}
-          </p>
-        </div>
+          {/* Projects */}
+          <div>
+            <h2 className="font-semibold uppercase text-xs mb-2 text-gray-700 tracking-wider">
+              Projects
+            </h2>
+            {(projects.length ? projects : dummyProjects).map((proj) => (
+              <div key={proj.id} className="mb-3">
+                <p className="font-semibold text-sm">{proj.title}</p>
+                <p className="text-sm">{proj.description}</p>
+                <p className="text-xs text-blue-600 break-all">{proj.link}</p>
+              </div>
+            ))}
+          </div>
 
-        <div>
-          <h2 className="font-semibold uppercase text-xs mb-2 text-gray-700">
-            Experience
-          </h2>
-          {(experience.length > 0 ? experience : dummyExperience).map((exp) => (
-            <div key={exp.id} className="mb-4">
-              <p className="font-semibold">{exp.jobTitle} – {exp.company}</p>
-              <p className="text-xs text-gray-500">{exp.startDate} - {exp.endDate}</p>
-              <p className="mt-1">{exp.description}</p>
-            </div>
-          ))}
-        </div>
+          {/* References */}
+          <div>
+            <h2 className="font-semibold uppercase text-xs mb-2 text-gray-700 tracking-wider">
+              References
+            </h2>
+            {(references.length ? references : dummyReferences).map((ref) => (
+              <div key={ref.id} className="mb-3 text-sm">
+                <p className="font-medium">{ref.name}</p>
+                <p className="text-xs text-gray-500">
+                  {ref.position} – {ref.company}
+                </p>
+                <p className="text-xs text-gray-500">{ref.contact}</p>
+              </div>
+            ))}
+          </div>
 
-        <div>
-          <h2 className="font-semibold uppercase text-xs mb-2 text-gray-700">Education</h2>
-          {(education.length > 0 ? education : dummyEducation).map((edu) => (
-            <div key={edu.id} className="mb-3">
-              <p className="font-semibold">{edu.degree} – {edu.school}</p>
-              <p className="text-xs text-gray-500">{edu.startDate} - {edu.endDate}</p>
-            </div>
-          ))}
-        </div>
-
-        <div>
-          <h2 className="font-semibold uppercase text-xs mb-2 text-gray-700">Projects</h2>
-          {(projects.length > 0 ? projects : dummyProjects).map((proj) => (
-            <div key={proj.id} className="mb-3">
-              <p className="font-semibold">{proj.title}</p>
-              <p>{proj.description}</p>
-              <p className="text-xs text-blue-600">{proj.link}</p>
-            </div>
-          ))}
-        </div>
-
-        <div>
-          <h2 className="font-semibold uppercase text-xs mb-2 text-gray-700">References</h2>
-          {(references.length > 0 ? references : dummyReferences).map((ref) => (
-            <div key={ref.id} className="mb-3">
-              <p className="font-medium">Name: {ref.name}</p>
-              <p className="text-xs text-gray-500">Company: {ref.company}</p>
-              <p className="text-xs text-gray-500">Positon: {ref.position}</p>
-              
-              <p className="text-xs text-gray-500">Telephone Number:{ref.contact}</p>
-            </div>
-          ))}
         </div>
       </div>
     </div>

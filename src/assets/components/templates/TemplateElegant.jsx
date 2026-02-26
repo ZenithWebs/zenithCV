@@ -91,139 +91,146 @@ const TemplateElegant = () => {
   };
 
   return (
-    <div className="w-[794px] min-h-[1123px] bg-white shadow-lg text-gray-800 font-serif p-12">
+    <div className="flex justify-center bg-gray-200 py-10 overflow-auto">
+      <div
+        style={{
+          transform: "scale(0.5)",
+          transformOrigin: "top center",
+        }}
+      >
+        <div className="w-[794px] min-h-[1123px] bg-white shadow-lg text-gray-800 font-serif p-12">
 
-      {/* HEADER */}
-      <div className="text-center mb-8">
-        <h1 className="text-3xl tracking-[6px] font-light uppercase">
-          {finalData.personalInfo.fullName || dummyData.personalInfo.fullName}
-        </h1>
+          <div className="text-center mb-8">
+            <h1 className="text-3xl tracking-[6px] font-light uppercase">
+              {finalData.personalInfo.fullName}
+            </h1>
 
-        <p className="text-xs tracking-[4px] text-gray-500 mt-2 uppercase">
-          {finalData.personalInfo.title || dummyData.personalInfo.title}
-        </p>
-
-        <div className="border-t border-gray-300 mt-6"></div>
-      </div>
-
-      <div className="grid grid-cols-3 gap-10">
-
- 
-        <div className="col-span-1 space-y-8">
-
-          <div>
-            <SectionTitle>Contact</SectionTitle>
-            <div className="text-xs space-y-2 leading-relaxed">
-              <p>{finalData.personalInfo.email || dummyData.personalInfo.email}</p>
-              <p>{finalData.personalInfo.phone || dummyData.personalInfo.phone}</p>
-              <p>{finalData.personalInfo.location || dummyData.personalInfo.location}</p>
-              <p>{finalData.personalInfo.linkedin || dummyData.personalInfo.linkedin}</p>
-              <p>{finalData.personalInfo.portfolio || dummyData.personalInfo.portfolio}</p>
-            </div>
-          </div>
-
-          <div>
-            <SectionTitle>Education</SectionTitle>
-            <div className="text-xs space-y-4">
-              {finalData.education.map((edu, index) => (
-                <div key={index}>
-                  <p className="font-semibold">{edu.degree}</p>
-                  <p className="italic">{edu.school}</p>
-                  <p className="text-gray-500">{edu.year}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <SectionTitle>Skills</SectionTitle>
-            <ul className="text-xs space-y-1 list-disc list-inside">
-              {finalData.skills.map((skill, index) => (
-                <li key={index}>{skill}</li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <SectionTitle>Languages</SectionTitle>
-            <ul className="text-xs space-y-1">
-              {finalData.languages.map((lang, index) => (
-                <li key={index}>{lang}</li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <SectionTitle>Certifications</SectionTitle>
-            <ul className="text-xs space-y-2">
-              {finalData.certifications.map((cert, index) => (
-                <li key={index}>
-                  {cert.name} {cert.year && `(${cert.year})`}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-        </div>
-
-        {/* RIGHT CONTENT */}
-        <div className="col-span-2 space-y-10">
-
-          <div>
-            <SectionTitle>Profile Summary</SectionTitle>
-            <p className="text-sm leading-relaxed text-gray-700">
-              {finalData.professionalSummary}
+            <p className="text-xs tracking-[4px] text-gray-500 mt-2 uppercase">
+              {finalData.personalInfo.title}
             </p>
+
+            <div className="border-t border-gray-300 mt-6"></div>
           </div>
 
-          <div>
-            <SectionTitle>Work Experience</SectionTitle>
-            <div className="space-y-6">
-              {finalData.experience.map((exp, index) => (
-                <div key={index}>
-                  <div className="flex justify-between text-sm font-semibold">
-                    <p>{exp.jobTitle}</p>
-                    <p className="text-gray-500">
-                      {exp.startDate} - {exp.endDate}
-                    </p>
-                  </div>
-                  <p className="italic text-sm">{exp.company}</p>
-                  <p className="italic text-sm">{exp.location}</p>
-                  <p className="text-sm mt-2 text-gray-700 leading-relaxed">
-                    {exp.description}
-                  </p>
+          <div className="grid grid-cols-3 gap-10">
+
+            <div className="col-span-1 space-y-8">
+
+              <div>
+                <SectionTitle>Contact</SectionTitle>
+                <div className="text-xs space-y-2 leading-relaxed">
+                  <p>{finalData.personalInfo.email}</p>
+                  <p>{finalData.personalInfo.phone}</p>
+                  <p>{finalData.personalInfo.location}</p>
+                  <p>{finalData.personalInfo.linkedin}</p>
+                  <p>{finalData.personalInfo.portfolio}</p>
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
 
-          <div>
-            <SectionTitle>Projects</SectionTitle>
-            <div className="space-y-4">
-              {finalData.projects.map((project, index) => (
-                <div key={index}>
-                  <p className="font-semibold text-sm">{project.title}</p>
-                  <p className="text-sm text-gray-700">
-                    {project.description}
-                  </p>
-                  <p className="italic text-[10px]">{project.link}</p>
+              <div>
+                <SectionTitle>Education</SectionTitle>
+                <div className="text-xs space-y-4">
+                  {finalData.education.map((edu, index) => (
+                    <div key={index}>
+                      <p className="font-semibold">{edu.degree}</p>
+                      <p className="italic">{edu.school}</p>
+                      <p className="text-gray-500">{edu.year}</p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
 
-          <div>
-            <SectionTitle>References</SectionTitle>
-            <div className="space-y-3">
-              {finalData.references.map((ref, index) => (
-                <div key={index}>
-                  <p className="text-sm font-semibold">{ref.name}</p>
-                  <p className="text-sm text-gray-600">{ref.phone}</p>
+              <div>
+                <SectionTitle>Skills</SectionTitle>
+                <ul className="text-xs space-y-1 list-disc list-inside">
+                  {finalData.skills.map((skill, index) => (
+                    <li key={index}>{skill}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <SectionTitle>Languages</SectionTitle>
+                <ul className="text-xs space-y-1">
+                  {finalData.languages.map((lang, index) => (
+                    <li key={index}>{lang}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <SectionTitle>Certifications</SectionTitle>
+                <ul className="text-xs space-y-2">
+                  {finalData.certifications.map((cert, index) => (
+                    <li key={index}>
+                      {cert.name} {cert.year && `(${cert.year})`}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+            </div>
+
+            <div className="col-span-2 space-y-10">
+
+              <div>
+                <SectionTitle>Profile Summary</SectionTitle>
+                <p className="text-sm leading-relaxed text-gray-700">
+                  {finalData.professionalSummary}
+                </p>
+              </div>
+
+              <div>
+                <SectionTitle>Work Experience</SectionTitle>
+                <div className="space-y-6">
+                  {finalData.experience.map((exp, index) => (
+                    <div key={index}>
+                      <div className="flex justify-between text-sm font-semibold">
+                        <p>{exp.jobTitle}</p>
+                        <p className="text-gray-500">
+                          {exp.startDate} - {exp.endDate}
+                        </p>
+                      </div>
+                      <p className="italic text-sm">{exp.company}</p>
+                      <p className="italic text-sm">{exp.location}</p>
+                      <p className="text-sm mt-2 text-gray-700 leading-relaxed">
+                        {exp.description}
+                      </p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
 
+              <div>
+                <SectionTitle>Projects</SectionTitle>
+                <div className="space-y-4">
+                  {finalData.projects.map((project, index) => (
+                    <div key={index}>
+                      <p className="font-semibold text-sm">{project.title}</p>
+                      <p className="text-sm text-gray-700">
+                        {project.description}
+                      </p>
+                      <p className="italic text-[10px]">{project.link}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <SectionTitle>References</SectionTitle>
+                <div className="space-y-3">
+                  {finalData.references.map((ref, index) => (
+                    <div key={index}>
+                      <p className="text-sm font-semibold">{ref.name}</p>
+                      <p className="text-sm text-gray-600">{ref.phone}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+
+          </div>
         </div>
       </div>
     </div>

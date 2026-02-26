@@ -25,6 +25,7 @@ const Login = () => {
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
+  // 🔥 Save user to Firestore
   const saveUserToFirestore = async (user) => {
     const userRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userRef);
@@ -35,7 +36,7 @@ const Login = () => {
         uid: user.uid,
         name: user.displayName || "",
         email: user.email,
-        pro: false, // default plan
+        pro: false,
         createdAt: new Date(),
       });
     }
@@ -178,5 +179,3 @@ const Login = () => {
 };
 
 export default Login;
-
-
