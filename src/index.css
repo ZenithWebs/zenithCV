@@ -1,16 +1,32 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
-
-
+@import 'tailwindcss';
 *{
     outline: none;
-    font-family: "Outfit", sans-serif;
+    font-family: "poppins", sans-serif;
 }
+
 @media print {
+  @page {
+    size: A4;
+    
+  }
+
   body {
+    margin: 0;
     background: white;
   }
 
-  .page-break {
-    page-break-after: always;
+  .no-print {
+    display: none !important;
+  }
+
+  .shadow-md,
+  .shadow-sm,
+  .shadow-lg {
+    box-shadow: none !important;
+  }
+
+  #resume-preview {
+    width: 100%;
   }
 }
+
