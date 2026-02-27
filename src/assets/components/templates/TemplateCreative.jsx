@@ -68,7 +68,7 @@ const TemplateCreative = ({ themeColor = "blue" }) => {
   ];
 
   return (
-    <div className="md:w-[850px] min-h-[1100px] bg-white shadow-xl flex text-sm overflow-scroll">
+    <div className="md:w-[850px] min-h-[1100px] bg-white shadow-xl flex text-sm overflow-hidden">
       <div className={`w-1/3 text-white p-8 flex flex-col gap-6 ${colorMap[themeColor]}`}>
         <h1 className="text-3xl font-bold mb-2">
           {personalInfo.fullName || "John Doe"}

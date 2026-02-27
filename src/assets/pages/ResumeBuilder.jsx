@@ -46,15 +46,41 @@ const ResumeBuilder = () => {
   const { resumeData, setResumeData } = useResume();
 
   const resumeRef = useRef();
+  const previewContainerRef = useRef();
 
   const handlePrint = useReactToPrint({
     contentRef: resumeRef,
     documentTitle: "zenithcv-resume",
   });
+  useEffect(() => {
+    const preview = document.getElementById('resume-preview')
+    const scaleToFit = () => {
+      if (!resumeRef.current || !previewContainerRef.current) return;
+
+      const containerWidth = previewContainerRef.current.clientWidth - 32; 
+      const containerHeight = previewContainerRef.current.clientHeight - 32;
+
+      const resumeWidth = 210 * 3.78; // 210mm → px
+      const resumeHeight = 297 * 3.78; // 297mm → px
+
+      const scale = Math.min(
+        containerWidth / resumeWidth,
+        containerHeight / resumeHeight,
+        1
+      );
+
+      resumeRef.current.style.transform = `scale(${scale})`;
+    };
+
+    scaleToFit();
+    window.addEventListener("resize", scaleToFit);
+
+    return () => window.removeEventListener("resize", scaleToFit);
+  }, [resumeData, activeTab]);
 
   const calculateProgress = () => {
-    let total = 0;
-    let filled = 0;
+    let total = 0,
+      filled = 0;
 
     const checkValue = (value) => {
       if (Array.isArray(value)) {
@@ -63,9 +89,7 @@ const ResumeBuilder = () => {
         Object.values(value).forEach((val) => checkValue(val));
       } else {
         total++;
-        if (value !== "" && value !== null && value !== undefined) {
-          filled++;
-        }
+        if (value !== "" && value !== null && value !== undefined) filled++;
       }
     };
 
@@ -78,12 +102,8 @@ const ResumeBuilder = () => {
       if (!resumeId) return;
 
       try {
-        const resumeRef = doc(db, "resumes", resumeId);
-        const resumeSnap = await getDoc(resumeRef);
-
-        if (resumeSnap.exists()) {
-          setResumeData(resumeSnap.data());
-        }
+        const resumeSnap = await getDoc(doc(db, "resumes", resumeId));
+        if (resumeSnap.exists()) setResumeData(resumeSnap.data());
       } catch (error) {
         console.error(error);
       }
@@ -95,7 +115,6 @@ const ResumeBuilder = () => {
   const saveResume = async () => {
     try {
       const user = auth.currentUser;
-
       if (!user) {
         setSavedMessage("You must be logged in ❌");
         return;
@@ -129,7 +148,6 @@ const ResumeBuilder = () => {
     }
   };
 
-
   const resetResume = () => {
     setResumeData({
       personalInfo: {},
@@ -142,7 +160,6 @@ const ResumeBuilder = () => {
       languages: [],
       references: [],
     });
-
     setFormKey((prev) => prev + 1);
   };
 
@@ -151,20 +168,16 @@ const ResumeBuilder = () => {
       case "creative":
         return <TemplateCreative data={resumeData} themeColor={themeColor} />;
       case "corporate-pro":
-        return (
-          <TemplateCorporatePro
-            data={resumeData}
-            accentColor={themeColor}
-          />
-        );
+        return <TemplateCorporatePro data={resumeData} accentColor={themeColor} />;
       default:
         return <TemplateElegant data={resumeData} />;
     }
   };
 
-    return (
+  return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
 
+      {/* Header */}
       <header className="bg-white border-b px-4 sm:px-8 py-4 flex justify-between items-center gap-4 sticky top-0 z-30 shadow-sm no-print">
         <div
           onClick={() => navigate(-1)}
@@ -205,6 +218,7 @@ const ResumeBuilder = () => {
         </div>
       )}
 
+      {/* Mobile tabs */}
       <div className="lg:hidden flex border-b bg-white no-print">
         <button
           onClick={() => setActiveTab("form")}
@@ -237,7 +251,11 @@ const ResumeBuilder = () => {
           }`}
         >
           <div className="max-w-3xl mx-auto px-4 sm:px-8 py-8 space-y-10">
-            <motion.div key={formKey} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <motion.div
+              key={formKey}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
               <PersonalInfo data={resumeData.personalInfo} setResumeData={setResumeData} />
               <ProfessionalSummary data={resumeData.professionalSummary} setResumeData={setResumeData} />
               <Experience data={resumeData.experience} setResumeData={setResumeData} />
@@ -252,21 +270,23 @@ const ResumeBuilder = () => {
         </div>
 
         <div
-          className={`w-full lg:w-1/2 bg-gray-100 flex justify-center overflow-scroll ${
-            activeTab === "form" ? "hidden lg:flex" : "flex"
-          }`}
+          className={`w-full min-h-screen lg:w-1/2 bg-gray-100 flex justify-center overflow-auto p-4`}
         >
-          <div className="py-10">
-            <div
-              ref={resumeRef}
-              className="w-[210mm] min-h-[297mm] bg-white overflow-scroll"
-            >
-              {renderTemplate()}
-            </div>
+          <div
+            ref={resumeRef}
+            id="resume-preview"
+            className="bg-white shadow-md"
+            style={{
+              width: "210mm",
+              minHeight: "297mm",
+              transform: "scale(0.7 )",
+              transformOrigin: "top center",
+            }}
+          >
+            {renderTemplate()}
           </div>
         </div>
       </div>
-
       <motion.button
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -275,18 +295,20 @@ const ResumeBuilder = () => {
         className="lg:hidden fixed bottom-6 right-6 bg-black text-white p-4 rounded-full shadow-2xl active:scale-95 transition z-50 no-print"
       >
         <Save size={22} />
-        
       </motion.button>
+
       <motion.button
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
         onClick={handlePrint}
-        className={` ${activeTab === 'preview' ? 'flex' : 'hidden'} lg:hidden fixed bottom-22 right-6 bg-blue-800 text-white p-4 rounded-full shadow-2xl active:scale-95 transition z-50 no-print`}
+        className={`${
+          activeTab === "preview" ? "flex" : "hidden"
+        } lg:hidden fixed bottom-22 right-6 bg-blue-800 text-white p-4 rounded-full shadow-2xl active:scale-95 transition z-50 no-print`}
       >
         <Printer size={22} />
       </motion.button>
-      
+
     </div>
   );
 };

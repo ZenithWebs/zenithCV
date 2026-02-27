@@ -5,14 +5,11 @@
 }
 
 @media print {
-  @page {
-    size: A4;
-    
-  }
-
   body {
     margin: 0;
+    padding: 0;
     background: white;
+    -webkit-print-color-adjust: exact; 
   }
 
   .no-print {
@@ -25,8 +22,18 @@
     box-shadow: none !important;
   }
 
-  #resume-preview {
-    width: 100%;
+  #resume-preview > * {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100%;
+  }
+
+  .resume-section {
+    page-break-after: avoid;
+  }
+
+  @page {
+    size: A4 portrait;
   }
 }
 
