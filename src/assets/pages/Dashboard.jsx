@@ -92,8 +92,7 @@ const Dashboard = () => {
           : "bg-gray-50"
       }`}
     >
-      {/* ================= MOBILE TOPBAR ================= */}
-      <div className="md:hidden fixed top-0 left-0 right-0 bg-white shadow z-50 flex items-center justify-between px-4 py-3">
+      <div className={`md:hidden fixed top-0 left-0 right-0 ${isProUser ? 'bg-gradient-to-br from-black via-gray-900 to-gray-800 text-white' : "bg-white"}  shadow z-50 flex items-center justify-between px-4 py-3`}>
         <div className="flex items-center gap-2">
           <img src={logo} className="w-8" alt="logo" />
           <span className="font-bold">ZenithCV</span>
@@ -103,7 +102,7 @@ const Dashboard = () => {
         </button>
       </div>
 
-      {/* ================= SIDEBAR ================= */}
+
       <aside
         className={`fixed md:static top-0 left-0 h-full w-64 z-50 transform transition-transform duration-300 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
