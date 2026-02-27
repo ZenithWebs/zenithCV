@@ -42,7 +42,6 @@ const Login = () => {
     }
   };
 
-  // Email login
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");

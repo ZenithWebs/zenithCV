@@ -13,7 +13,7 @@ import Home from './assets/pages/Home';
 import PaymentSuccess from './assets/pages/PaymentSuccess';
 
 const AppRoutes = () => {
-  const { user } = useAuth(); // ✅ valid here inside a component
+  const { user } = useAuth();
 
   return (
     <Routes>

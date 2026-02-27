@@ -1,7 +1,6 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
-import { useReactToPrint } from "react-to-print";
 import { useResume } from "../context/ResumeContext";
 
 import PersonalInfo from "../components/form/PersonalInfo";
@@ -19,7 +18,7 @@ import TemplateElegant from "../components/templates/TemplateElegant";
 import TemplateCorporatePro from "../components/templates/TemplateCorporatePro";
 
 import logo from "../logos/logo.png";
-import { ArrowLeft, Printer, Save } from "lucide-react";
+import { ArrowLeft, Save, Download } from "lucide-react";
 
 import { auth, db } from "../firebase/firebase";
 import {
@@ -31,6 +30,25 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+
+const colorMap = {
+  blue: "bg-blue-500",
+  green: "bg-emerald-500",
+  yellow: "bg-yellow-500",
+  purple: "bg-purple-700",
+  red: "bg-red-500",
+  gray: "bg-gray-800",
+
+  textBlue: "#3b82f6",
+  textGreen: "#10b981",
+  textYellow: "#facc15",
+  textPurple: "#7c3aed",
+  textRed: "#ef4444",
+  textGray: "#1f2937",
+};
+
 const ResumeBuilder = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -39,113 +57,92 @@ const ResumeBuilder = () => {
   const resumeId = searchParams.get("resumeId");
 
   const [themeColor, setThemeColor] = useState("blue");
+  const [accentColor, setAccentColor] = useState("blue");
   const [savedMessage, setSavedMessage] = useState("");
-  const [activeTab, setActiveTab] = useState("form");
   const [formKey, setFormKey] = useState(0);
 
   const { resumeData, setResumeData } = useResume();
 
-  const resumeRef = useRef();
-  const previewContainerRef = useRef();
+  const resumeRef = useRef(null);
+  const previewWrapperRef = useRef(null);
 
-  const handlePrint = useReactToPrint({
-    contentRef: resumeRef,
-    documentTitle: "zenithcv-resume",
-  });
   useEffect(() => {
-    const preview = document.getElementById('resume-preview')
     const scaleToFit = () => {
-      if (!resumeRef.current || !previewContainerRef.current) return;
+      if (!resumeRef.current || !previewWrapperRef.current) return;
 
-      const containerWidth = previewContainerRef.current.clientWidth - 32; 
-      const containerHeight = previewContainerRef.current.clientHeight - 32;
+      const containerWidth = previewWrapperRef.current.clientWidth;
+      const resumeWidth = resumeRef.current.offsetWidth;
 
-      const resumeWidth = 210 * 3.78; // 210mm → px
-      const resumeHeight = 297 * 3.78; // 297mm → px
-
-      const scale = Math.min(
-        containerWidth / resumeWidth,
-        containerHeight / resumeHeight,
-        1
-      );
+      const scale = Math.min(containerWidth / resumeWidth, 1);
 
       resumeRef.current.style.transform = `scale(${scale})`;
+      resumeRef.current.style.transformOrigin = "top center";
     };
 
     scaleToFit();
     window.addEventListener("resize", scaleToFit);
-
     return () => window.removeEventListener("resize", scaleToFit);
-  }, [resumeData, activeTab]);
-
-  const calculateProgress = () => {
-    let total = 0,
-      filled = 0;
-
-    const checkValue = (value) => {
-      if (Array.isArray(value)) {
-        value.forEach((item) => checkValue(item));
-      } else if (typeof value === "object" && value !== null) {
-        Object.values(value).forEach((val) => checkValue(val));
-      } else {
-        total++;
-        if (value !== "" && value !== null && value !== undefined) filled++;
-      }
-    };
-
-    checkValue(resumeData);
-    return total === 0 ? 0 : Math.round((filled / total) * 100);
-  };
+  }, [resumeData]);
 
   useEffect(() => {
     const fetchResume = async () => {
       if (!resumeId) return;
-
-      try {
-        const resumeSnap = await getDoc(doc(db, "resumes", resumeId));
-        if (resumeSnap.exists()) setResumeData(resumeSnap.data());
-      } catch (error) {
-        console.error(error);
-      }
+      const snap = await getDoc(doc(db, "resumes", resumeId));
+      if (snap.exists()) setResumeData(snap.data());
     };
-
     fetchResume();
   }, [resumeId, setResumeData]);
 
   const saveResume = async () => {
-    try {
-      const user = auth.currentUser;
-      if (!user) {
-        setSavedMessage("You must be logged in ❌");
-        return;
-      }
-
-      const resumePayload = {
-        userId: user.uid,
-        templateId: selectedTemplate,
-        ...resumeData,
-        updatedAt: serverTimestamp(),
-      };
-
-      if (resumeId) {
-        await updateDoc(doc(db, "resumes", resumeId), resumePayload);
-      } else {
-        const docRef = await addDoc(collection(db, "resumes"), {
-          ...resumePayload,
-          createdAt: serverTimestamp(),
-        });
-
-        navigate(
-          `/resumebuilder?template=${selectedTemplate}&resumeId=${docRef.id}`
-        );
-      }
-
-      setSavedMessage("Resume saved successfully ☁️✅");
-      setTimeout(() => setSavedMessage(""), 2500);
-    } catch (error) {
-      console.error(error);
-      setSavedMessage("Failed to save ❌");
+    const user = auth.currentUser;
+    if (!user) {
+      setSavedMessage("Login required ❌");
+      return;
     }
+
+    const payload = {
+      userId: user.uid,
+      templateId: selectedTemplate,
+      themeColor,
+      ...resumeData,
+      updatedAt: serverTimestamp(),
+    };
+
+    if (resumeId) {
+      await updateDoc(doc(db, "resumes", resumeId), payload);
+    } else {
+      const ref = await addDoc(collection(db, "resumes"), {
+        ...payload,
+        createdAt: serverTimestamp(),
+      });
+
+      navigate(
+        `/resumebuilder?template=${selectedTemplate}&resumeId=${ref.id}`
+      );
+    }
+
+    setSavedMessage("Saved successfully ☁️");
+    setTimeout(() => setSavedMessage(""), 2500);
+  };
+
+  const downloadPDF = async () => {
+    if (!resumeRef.current) return;
+
+    const originalTransform = resumeRef.current.style.transform;
+    resumeRef.current.style.transform = "scale(1)";
+
+    const canvas = await html2canvas(resumeRef.current, {
+      scale: 3,
+      useCORS: true,
+    });
+
+    resumeRef.current.style.transform = originalTransform;
+
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    pdf.addImage(imgData, "PNG", 0, 0, 210, 297);
+    pdf.save("ZenithCV-Resume.pdf");
   };
 
   const resetResume = () => {
@@ -164,21 +161,22 @@ const ResumeBuilder = () => {
   };
 
   const renderTemplate = () => {
-    switch (selectedTemplate) {
-      case "creative":
-        return <TemplateCreative data={resumeData} themeColor={themeColor} />;
-      case "corporate-pro":
-        return <TemplateCorporatePro data={resumeData} accentColor={themeColor} />;
-      default:
-        return <TemplateElegant data={resumeData} />;
+  const colorClass = colorMap[themeColor];
+  const accentColorClass = colorMap[accentColor];
+  switch (selectedTemplate) {
+    case "creative":
+      return <TemplateCreative data={resumeData} themeColor={colorClass} />;
+    case "corporate-pro":
+      return <TemplateCorporatePro data={resumeData} themeColor={colorClass} accentColor={accentColorClass} />;
+    default:
+      return <TemplateElegant data={resumeData} themeColor={colorClass} />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex flex-col">
 
-      {/* Header */}
-      <header className="bg-white border-b px-4 sm:px-8 py-4 flex justify-between items-center gap-4 sticky top-0 z-30 shadow-sm no-print">
+      <header className="bg-white/80 backdrop-blur border-b px-6 py-4 flex justify-between items-center sticky top-0 z-40 shadow-sm">
         <div
           onClick={() => navigate(-1)}
           className="flex items-center gap-3 cursor-pointer"
@@ -188,74 +186,74 @@ const ResumeBuilder = () => {
           <span className="text-lg font-semibold">ZenithCV</span>
         </div>
 
-        <div className="flex flex-wrap gap-3 justify-center sm:justify-end">
+        <div className="hidden lg:flex items-center gap-4">
+            <div className="hidden lg:flex items-center gap-4">
+              {/* Theme colors — only show for templates that use themeColor */}
+              {["creative",].includes(selectedTemplate) && (
+                <div className="flex gap-2 bg-white p-2 rounded-xl shadow-sm">
+                  {["blue", "green", "yellow", "purple", "red", "gray"].map((color) => (
+                    <div
+                      key={color}
+                      onClick={() => setThemeColor(color)}
+                      className={`w-6 h-6 rounded-full cursor-pointer border-2 transition ${colorMap[color]} ${
+                        themeColor === color ? "border-black scale-110" : "border-transparent"
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* Accent colors — only show for templates that use accentColor */}
+              {["corporate-pro"].includes(selectedTemplate) && (
+                <div className="flex gap-2 bg-white p-2 rounded-xl shadow-sm">
+                  {["textBlue", "textGreen", "textYellow", "textPurple", "textRed", "textGray"].map((textColor) => (
+                    <div
+                      key={textColor}
+                      onClick={() => setAccentColor(textColor)}
+                      style={{ backgroundColor: colorMap[textColor] }}
+                      className={`w-6 h-6 rounded-full cursor-pointer border-2 transition ${
+                        accentColor === textColor ? "border-black scale-110" : "border-transparent"
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           <button
             onClick={saveResume}
-            className="px-4 py-2 text-sm bg-black text-white max-md:hidden rounded-lg"
+            className="px-4 py-2 bg-black text-white rounded-lg hover:opacity-90"
           >
             Save
           </button>
 
           <button
             onClick={resetResume}
-            className="px-4 py-2 text-sm bg-red-500 text-white rounded-lg"
+            className="px-4 py-2 bg-red-500 text-white rounded-lg"
           >
             Reset
           </button>
 
           <button
-            onClick={handlePrint}
-            className="px-4 py-2 text-sm bg-blue-800 text-white rounded-lg max-sm:hidden"
+            onClick={downloadPDF}
+            className="px-4 py-2 bg-blue-700 text-white rounded-lg flex items-center gap-2"
           >
-            Print CV
+            <Download size={16} />
+            Download PDF
           </button>
         </div>
       </header>
 
       {savedMessage && (
-        <div className="bg-green-100 text-green-700 text-center py-2 text-sm no-print">
+        <div className="bg-green-100 text-green-700 text-center py-2 text-sm">
           {savedMessage}
         </div>
       )}
 
-      {/* Mobile tabs */}
-      <div className="lg:hidden flex border-b bg-white no-print">
-        <button
-          onClick={() => setActiveTab("form")}
-          className={`flex-1 py-3 text-sm font-medium ${
-            activeTab === "form"
-              ? "border-b-2 border-black text-black"
-              : "text-gray-500"
-          }`}
-        >
-          Form
-        </button>
-
-        <button
-          onClick={() => setActiveTab("preview")}
-          className={`flex-1 py-3 text-sm font-medium ${
-            activeTab === "preview"
-              ? "border-b-2 border-black text-black"
-              : "text-gray-500"
-          }`}
-        >
-          Preview
-        </button>
-      </div>
-
       <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
 
-        <div
-          className={`w-full lg:w-1/2 bg-white border-r overflow-y-auto ${
-            activeTab === "preview" ? "hidden lg:block" : "block"
-          }`}
-        >
-          <div className="max-w-3xl mx-auto px-4 sm:px-8 py-8 space-y-10">
-            <motion.div
-              key={formKey}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
+        <div className="w-full lg:w-1/2 bg-white overflow-y-auto">
+          <div className="max-w-3xl mx-auto px-6 py-8 space-y-10">
+            <motion.div key={formKey} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <PersonalInfo data={resumeData.personalInfo} setResumeData={setResumeData} />
               <ProfessionalSummary data={resumeData.professionalSummary} setResumeData={setResumeData} />
               <Experience data={resumeData.experience} setResumeData={setResumeData} />
@@ -270,29 +268,55 @@ const ResumeBuilder = () => {
         </div>
 
         <div
-          className={`w-full min-h-screen lg:w-1/2 bg-gray-100 flex justify-center overflow-auto p-4`}
+          ref={previewWrapperRef}
+          className="w-full relative lg:w-1/2 flex justify-center items-start overflow-auto p-6"
         >
           <div
             ref={resumeRef}
-            id="resume-preview"
-            className="bg-white shadow-md"
+            className="bg-white shadow-2xl rounded-sm"
             style={{
               width: "210mm",
               minHeight: "297mm",
-              transform: "scale(0.7 )",
-              transformOrigin: "top center",
             }}
           >
             {renderTemplate()}
           </div>
+          <div className="left-1 top-20 flex flex-col md:hidden absolute gap-2 bg-white p-2 rounded-xl shadow-sm">
+            {["creative", ].includes(selectedTemplate) &&
+              ["blue", "green", "yellow", "purple", "red", "gray"].map((color) => (
+                <div
+                  key={color}
+                  onClick={() => setThemeColor(color)}
+                  style={{ backgroundColor: colorMap[color] }}
+                  className={`w-6 h-6 rounded-full cursor-pointer border-2 transition ${colorMap[color]} ${
+                    themeColor === color ? "border-black scale-110" : "border-transparent"
+                  }`}
+                />
+              ))}
+          </div>
+
+          <div className="left-1 top-20 flex flex-col md:hidden absolute gap-2 bg-white p-2 rounded-xl shadow-sm">
+            {["corporate-pro"].includes(selectedTemplate) &&
+              ["textBlue", "textGreen", "textYellow", "textPurple", "textRed", "textGray"].map((textColor) => (
+                <div
+                  key={textColor}
+                  onClick={() => setAccentColor(textColor)}
+                  style={{ backgroundColor: colorMap[textColor] }}
+                  className={`w-6 h-6 rounded-full cursor-pointer border-2 transition ${
+                    accentColor === textColor ? "border-black scale-110" : "border-transparent"
+                  }`}
+                />
+              ))}
+          </div>
         </div>
       </div>
+      
+
       <motion.button
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
         onClick={saveResume}
-        className="lg:hidden fixed bottom-6 right-6 bg-black text-white p-4 rounded-full shadow-2xl active:scale-95 transition z-50 no-print"
+        className="lg:hidden fixed bottom-6 right-6 bg-black text-white p-4 rounded-full shadow-2xl"
       >
         <Save size={22} />
       </motion.button>
@@ -300,15 +324,11 @@ const ResumeBuilder = () => {
       <motion.button
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        onClick={handlePrint}
-        className={`${
-          activeTab === "preview" ? "flex" : "hidden"
-        } lg:hidden fixed bottom-22 right-6 bg-blue-800 text-white p-4 rounded-full shadow-2xl active:scale-95 transition z-50 no-print`}
+        onClick={downloadPDF}
+        className="lg:hidden fixed bottom-24 right-6 bg-blue-700 text-white p-4 rounded-full shadow-2xl"
       >
-        <Printer size={22} />
+        <Download size={22} />
       </motion.button>
-
     </div>
   );
 };

@@ -1,7 +1,6 @@
-@import 'tailwindcss';
 *{
     outline: none;
-    font-family: "poppins", sans-serif;
+    font-family: "outfit", sans-serif;
 }
 
 @media print {

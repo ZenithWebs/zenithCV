@@ -1,6 +1,6 @@
 import React from "react";
 
-const TemplateCorporatePro = ({ data = {}, accentColor = "#1f4e79" }) => {
+const TemplateCorporatePro = ({ data = {}, accentColor = "#1f2937" }) => {
   const {
     personalInfo = {},
     professionalSummary,
@@ -10,6 +10,9 @@ const TemplateCorporatePro = ({ data = {}, accentColor = "#1f4e79" }) => {
     certifications = [],
   } = data;
 
+  // -------------------------
+  // Dummy fallback data
+  // -------------------------
 
   const dummyPersonal = {
     fullName: "HERMA WALTON",
@@ -20,7 +23,7 @@ const TemplateCorporatePro = ({ data = {}, accentColor = "#1f4e79" }) => {
   };
 
   const dummySummary =
-    "Experienced and driven Financial Analyst with an impressive background of managing multi-million dollar budgets while providing analysis and account support within product development departments. Works to reduce business expenses and develop focused and aggressive operational plans.";
+    "Experienced and driven Financial Analyst with an impressive background of managing multi-million dollar budgets while providing analysis and account support within product development departments.";
 
   const dummyExperience = [
     {
@@ -31,23 +34,9 @@ const TemplateCorporatePro = ({ data = {}, accentColor = "#1f4e79" }) => {
       description:
         "• Created financial reports on completed projects.\n• Increased profit margin by 15%.\n• Managed budgets and forecast analysis.",
     },
-    {
-      jobTitle: "Financial Analyst",
-      company: "Cisco Enterprises",
-      startDate: "Feb 2008",
-      endDate: "Dec 2012",
-      description:
-        "• Provided reports and analysis.\n• Collaborated with cross-functional teams.\n• Created weekly labor finance reports.",
-    },
   ];
 
   const dummyEducation = [
-    {
-      degree: "Diploma in Computer Engineering",
-      institution: "University of Arizona",
-      startDate: "Aug 2006",
-      endDate: "Oct 2008",
-    },
     {
       degree: "Bachelor in Computer Engineering",
       institution: "University of Arizona",
@@ -57,27 +46,22 @@ const TemplateCorporatePro = ({ data = {}, accentColor = "#1f4e79" }) => {
   ];
 
   const dummySkills = [
-    "Solution Strategies",
     "Analytical Thinking",
     "Innovation",
     "Agile Methodologies",
-    "Customer Service",
-    "Market Assessment",
     "Collaboration",
-    "Creative Problem Solving",
   ];
 
   const dummyCertifications = [
     "Certified Financial Analyst License",
-    "Most Innovative Employer of the Year (2011)",
   ];
 
-
+  // -------------------------
+  // Final data selection
+  // -------------------------
 
   const finalPersonal =
-    Object.keys(personalInfo).length > 0
-      ? personalInfo
-      : dummyPersonal;
+    Object.keys(personalInfo).length > 0 ? personalInfo : dummyPersonal;
 
   const finalSummary = professionalSummary || dummySummary;
   const finalExperience =
@@ -90,12 +74,17 @@ const TemplateCorporatePro = ({ data = {}, accentColor = "#1f4e79" }) => {
 
   return (
     <div
-      className="bg-white w-full shadow-lg md:w-[800px] min-h-[1100px] p-10 text-[14px] leading-relaxed"
-      style={{ fontFamily: "Arial, sans-serif" }}
+      className="bg-white w-full h-full p-10 text-[14px] leading-relaxed"
+      style={{
+        fontFamily: "Arial, sans-serif",
+        width: "210mm",
+        minHeight: "297mm",
+        boxSizing: "border-box",
+      }}
     >
-
+      {/* HEADER */}
       <div className="flex justify-between items-start border-b-2 pb-4">
-        <div>
+        <div className="flex-1 pr-4">
           <h1
             className="text-3xl font-bold tracking-wide uppercase"
             style={{ color: accentColor }}
@@ -107,30 +96,37 @@ const TemplateCorporatePro = ({ data = {}, accentColor = "#1f4e79" }) => {
             {finalPersonal.jobTitle}
           </p>
 
-          <p className="text-xs text-gray-600 mt-2">
+          <p className="text-xs text-gray-600 mt-2 break-words">
             {finalPersonal.location} | {finalPersonal.phone} |{" "}
             {finalPersonal.email}
           </p>
-          <div className="flex gap-1.5">
-            <p className="text-gray-500 text-sm p-0">{finalPersonal.linkedin || "https://linked.in/123"} </p> |
-            <p className="text-gray-500 text-sm p-0">{finalPersonal.portfolio || "www.myportfolio.com"}  </p>
+
+          <div className="flex flex-wrap gap-1 text-xs text-gray-500 mt-1">
+            <span>
+              {finalPersonal.linkedin || "https://linked.in/123"}
+            </span>
+            <span>|</span>
+            <span>
+              {finalPersonal.portfolio || "www.myportfolio.com"}
+            </span>
+          </div>
         </div>
-        </div>
-        
 
         {finalPersonal.photo && (
           <img
             src={finalPersonal.photo}
             alt="profile"
-            className="w-28 h-28 object-cover border"
+            className="w-28 h-28 object-cover border shrink-0"
           />
         )}
       </div>
 
+      {/* SUMMARY */}
       <Section title="SUMMARY" accentColor={accentColor}>
         <p>{finalSummary}</p>
       </Section>
 
+      {/* EXPERIENCE */}
       <Section title="PROFESSIONAL EXPERIENCE" accentColor={accentColor}>
         {finalExperience.map((exp, index) => (
           <div key={index} className="mb-5">
@@ -150,6 +146,7 @@ const TemplateCorporatePro = ({ data = {}, accentColor = "#1f4e79" }) => {
         ))}
       </Section>
 
+      {/* EDUCATION */}
       <Section title="EDUCATION" accentColor={accentColor}>
         {finalEducation.map((edu, index) => (
           <div key={index} className="mb-4">
@@ -164,33 +161,35 @@ const TemplateCorporatePro = ({ data = {}, accentColor = "#1f4e79" }) => {
         ))}
       </Section>
 
+      {/* SKILLS */}
       <Section title="TECHNICAL SKILLS" accentColor={accentColor}>
         <div className="grid grid-cols-2 gap-2">
           {finalSkills.map((skill, index) => (
-            <div key={index} className="text-sm">
+            <div key={index} className="text-sm break-words">
               • {typeof skill === "string" ? skill : skill.name}
             </div>
           ))}
         </div>
       </Section>
 
+      {/* CERTIFICATIONS */}
       <Section title="ADDITIONAL INFORMATION" accentColor={accentColor}>
         {finalCertifications.map((cert, index) => (
-            <div key={index} className="text-sm mb-1">
+          <div key={index} className="text-sm mb-1 break-words">
             •{" "}
             {typeof cert === "string"
-                ? cert
-                : `${cert.name || ""} ${
-                    cert.organization ? `- ${cert.organization}` : ""
+              ? cert
+              : `${cert.name || ""} ${
+                  cert.organization ? `- ${cert.organization}` : ""
                 } ${cert.year ? `(${cert.year})` : ""}`}
-            </div>
+          </div>
         ))}
-        </Section>
+      </Section>
     </div>
   );
 };
 
-
+// SECTION COMPONENT
 const Section = ({ title, children, accentColor }) => (
   <div className="mt-6">
     <h2
