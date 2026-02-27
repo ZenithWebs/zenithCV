@@ -252,15 +252,14 @@ const ResumeBuilder = () => {
         </div>
 
         <div
-          className={`w-full lg:w-1/2 bg-gray-100 flex justify-center overflow-y-auto ${
+          className={`w-full lg:w-1/2 bg-gray-100 flex justify-center overflow-scroll ${
             activeTab === "form" ? "hidden lg:flex" : "flex"
           }`}
         >
           <div className="py-10">
             <div
               ref={resumeRef}
-              id="resume-preview"
-              className="w-[210mm] min-h-[297mm] bg-white shadow-md"
+              className="w-[210mm] min-h-[297mm] bg-white overflow-scroll"
             >
               {renderTemplate()}
             </div>
@@ -283,7 +282,7 @@ const ResumeBuilder = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
         onClick={handlePrint}
-        className="lg:hidden fixed bottom-22 right-6 bg-blue-800 text-white p-4 rounded-full shadow-2xl active:scale-95 transition z-50 no-print"
+        className={` ${activeTab === 'preview' ? 'flex' : 'hidden'} lg:hidden fixed bottom-22 right-6 bg-blue-800 text-white p-4 rounded-full shadow-2xl active:scale-95 transition z-50 no-print`}
       >
         <Printer size={22} />
       </motion.button>
