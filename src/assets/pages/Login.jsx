@@ -65,7 +65,6 @@ const Login = () => {
     }
   };
 
-  // 🔥 Google login with Firestore save
   const handleGoogle = async () => {
     try {
       setLoading(true);

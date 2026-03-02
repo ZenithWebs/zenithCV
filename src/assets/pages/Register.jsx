@@ -149,14 +149,12 @@ const Register = () => {
           </button>
         </form>
 
-        {/* Divider */}
         <div className="flex items-center my-6">
           <div className="flex-1 border-t border-gray-400"></div>
           <span className="px-3 text-sm text-gray-500">OR</span>
           <div className="flex-1 border-t border-gray-400"></div>
         </div>
 
-        {/* Google Button */}
         <button
           onClick={handleGoogle}
           className="w-full border border-gray-300 py-3 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-100 transition"

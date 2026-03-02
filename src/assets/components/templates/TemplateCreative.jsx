@@ -59,19 +59,30 @@ const TemplateCreative = ({ themeColor }) => {
 
   return (
     <div
-      className="bg-white shadow-xl flex overflow-hidden"
+      className="resume-container bg-white shadow-xl flex overflow-hidden"
       style={{
-        width: "210mm",
-        minHeight: "297mm",
+        //width: "210mm",
+        //minHeight: "297mm",
       }}
     >
-      {/* LEFT SIDEBAR (Always 1/3 width) */}
       <div
         className={`w-1/3 text-white p-8 flex flex-col gap-6 ${themeColor}`}
       >
-        <h1 className="text-3xl font-bold mb-2">
+        <div className="flex flex-col justify-center items-center gap-1.5">
+          {personalInfo.photo && (
+          <img
+            src={personalInfo.photo}
+            alt="profile"
+            className="w-20 h-20 object-cover rounded-full flex mx-auto border shrink-0"
+          />
+        )}
+        <p className="text-2xl font-medium  capitalize text-center">
           {personalInfo.fullName || "John Doe"}
-        </h1>
+        </p>
+        <div className="h-0.5 w-1/2 bg-gray-200"/>
+        <p>{personalInfo.jobTitle}</p>
+        </div>
+        
 
         <div className="text-sm opacity-90 space-y-1">
           <p>{personalInfo.email || "johndoe@email.com"}</p>
@@ -96,7 +107,7 @@ const TemplateCreative = ({ themeColor }) => {
         </div>
 
         {/* Languages */}
-        <div>
+        <div className="resume-section">
           <h2 className="font-semibold uppercase text-sm mb-2">
             Languages
           </h2>
@@ -106,14 +117,14 @@ const TemplateCreative = ({ themeColor }) => {
               : [{ language: "English", level: "Fluent" }]
             ).map((lang, i) => (
               <li key={i}>
-                {lang.language} – {lang.level}
+                {lang.name} – {lang.level}
               </li>
             ))}
           </ul>
         </div>
 
         {/* Certifications */}
-        <div>
+        <div className="resume-section">
           <h2 className="font-semibold uppercase text-sm mb-2">
             Certifications
           </h2>
@@ -139,10 +150,10 @@ const TemplateCreative = ({ themeColor }) => {
         </div>
       </div>
 
-      {/* RIGHT CONTENT (Always 2/3 width) */}
+
       <div className="w-2/3 p-8 space-y-6">
         {/* Summary */}
-        <div>
+        <div className="resume-section">
           <h2 className="font-semibold uppercase text-sm mb-1 text-gray-700">
             Professional Summary
           </h2>
@@ -153,7 +164,7 @@ const TemplateCreative = ({ themeColor }) => {
         </div>
 
         {/* Experience */}
-        <div>
+        <div className="resume-section">
           <h2 className="font-semibold uppercase text-sm mb-1 text-gray-700">
             Experience
           </h2>
@@ -162,16 +173,17 @@ const TemplateCreative = ({ themeColor }) => {
               <p className="font-semibold text-base">
                 {exp.jobTitle} – {exp.company}
               </p>
+              <p className="font-medium">{exp.location}</p>
               <p className="text-sm text-gray-500">
                 {exp.startDate} - {exp.endDate}
               </p>
-              <p className="mt-1 text-base">{exp.description}</p>
+              <p className="mt-1 text-base"> <b>Description:</b> <br />{exp.description}</p>
             </div>
           ))}
         </div>
 
         {/* Education */}
-        <div>
+        <div className="resume-section">
           <h2 className="font-semibold uppercase text-sm mb-1 text-gray-700">
             Education
           </h2>
@@ -188,7 +200,7 @@ const TemplateCreative = ({ themeColor }) => {
         </div>
 
         {/* Projects */}
-        <div>
+        <div className="resume-section">
           <h2 className="font-semibold uppercase text-sm mb-1 text-gray-700">
             Projects
           </h2>
@@ -202,14 +214,14 @@ const TemplateCreative = ({ themeColor }) => {
         </div>
 
         {/* References */}
-        <div>
+        <div className="resume-section">
           <h2 className="font-semibold uppercase text-sm mb-1 text-gray-700">
             References
           </h2>
           {(references.length > 0 ? references : dummyReferences).map((ref) => (
-            <div key={ref.id} className="mb-3 text-sm">
+            <div key={ref} className="mb-3 text-sm">
               <p className="font-medium">Name: {ref.name}</p>
-              <p>Relationship: {ref.relationship}</p>
+              <p>Position: {ref.position}</p>
               <p>Contact: {ref.contact}</p>
             </div>
           ))}

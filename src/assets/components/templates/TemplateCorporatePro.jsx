@@ -10,10 +10,6 @@ const TemplateCorporatePro = ({ data = {}, accentColor = "#1f2937" }) => {
     certifications = [],
   } = data;
 
-  // -------------------------
-  // Dummy fallback data
-  // -------------------------
-
   const dummyPersonal = {
     fullName: "HERMA WALTON",
     jobTitle: "FINANCIAL ANALYST",
@@ -56,10 +52,6 @@ const TemplateCorporatePro = ({ data = {}, accentColor = "#1f2937" }) => {
     "Certified Financial Analyst License",
   ];
 
-  // -------------------------
-  // Final data selection
-  // -------------------------
-
   const finalPersonal =
     Object.keys(personalInfo).length > 0 ? personalInfo : dummyPersonal;
 
@@ -74,7 +66,7 @@ const TemplateCorporatePro = ({ data = {}, accentColor = "#1f2937" }) => {
 
   return (
     <div
-      className="bg-white w-full h-full p-10 text-[14px] leading-relaxed"
+      className="resume-container print-container bg-white p-10 pt-0 text-[14px] leading-relaxed"
       style={{
         fontFamily: "Arial, sans-serif",
         width: "210mm",
@@ -82,8 +74,7 @@ const TemplateCorporatePro = ({ data = {}, accentColor = "#1f2937" }) => {
         boxSizing: "border-box",
       }}
     >
-      {/* HEADER */}
-      <div className="flex justify-between items-start border-b-2 pb-4">
+      <div className="resume-section flex justify-between items-start border-b-2 pb-4">
         <div className="flex-1 pr-4">
           <h1
             className="text-3xl font-bold tracking-wide uppercase"
@@ -123,13 +114,13 @@ const TemplateCorporatePro = ({ data = {}, accentColor = "#1f2937" }) => {
 
       {/* SUMMARY */}
       <Section title="SUMMARY" accentColor={accentColor}>
-        <p>{finalSummary}</p>
+        <p className="resume-item">{finalSummary}</p>
       </Section>
 
       {/* EXPERIENCE */}
       <Section title="PROFESSIONAL EXPERIENCE" accentColor={accentColor}>
         {finalExperience.map((exp, index) => (
-          <div key={index} className="mb-5">
+          <div key={index} className="resume-section mb-5">
             <div className="flex justify-between font-semibold">
               <span>
                 {exp.jobTitle} — {exp.company}
@@ -149,7 +140,7 @@ const TemplateCorporatePro = ({ data = {}, accentColor = "#1f2937" }) => {
       {/* EDUCATION */}
       <Section title="EDUCATION" accentColor={accentColor}>
         {finalEducation.map((edu, index) => (
-          <div key={index} className="mb-4">
+          <div key={index} className="resume-section mb-4">
             <div className="flex justify-between font-semibold">
               <span>{edu.degree}</span>
               <span className="text-xs">
@@ -175,7 +166,7 @@ const TemplateCorporatePro = ({ data = {}, accentColor = "#1f2937" }) => {
       {/* CERTIFICATIONS */}
       <Section title="ADDITIONAL INFORMATION" accentColor={accentColor}>
         {finalCertifications.map((cert, index) => (
-          <div key={index} className="text-sm mb-1 break-words">
+          <div key={index} className="resume-section text-sm mb-1 break-words">
             •{" "}
             {typeof cert === "string"
               ? cert
@@ -189,9 +180,8 @@ const TemplateCorporatePro = ({ data = {}, accentColor = "#1f2937" }) => {
   );
 };
 
-// SECTION COMPONENT
 const Section = ({ title, children, accentColor }) => (
-  <div className="mt-6">
+  <div className="resume-section mt-6">
     <h2
       className="text-sm font-bold border-b-2 pb-1 mb-3 uppercase"
       style={{

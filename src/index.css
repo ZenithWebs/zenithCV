@@ -1,38 +1,21 @@
 *{
     outline: none;
-    font-family: "outfit", sans-serif;
+    font-family: "Inter", sans-serif;
 }
 
-@media print {
-  body {
-    margin: 0;
-    padding: 0;
-    background: white;
-    -webkit-print-color-adjust: exact; 
-  }
-
-  .no-print {
-    display: none !important;
-  }
-
-  .shadow-md,
-  .shadow-sm,
-  .shadow-lg {
-    box-shadow: none !important;
-  }
-
-  #resume-preview > * {
-    margin: 0 !important;
-    padding: 0 !important;
-    max-width: 100%;
-  }
-
-  .resume-section {
-    page-break-after: avoid;
-  }
-
-  @page {
-    size: A4 portrait;
-  }
+.resume-container{
+  width:210mm;
+  min-height:297mm;
+  padding:5mm;
+  box-sizing:border-box;
+  background:white;
 }
-
+.resume-section{
+  page-break-inside: avoid;
+  break-inside: avoid;
+  margin-bottom:18px;
+}
+.resume-item{
+  page-break-inside: avoid;
+  break-inside: avoid;
+}

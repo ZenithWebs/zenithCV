@@ -10,132 +10,149 @@ const SectionTitle = ({ children }) => (
 const TemplateElegant = () => {
   const { resumeData } = useResume();
 
-  const {
-    personalInfo = {},
-    professionalSummary = "",
-    experience = [],
-    education = [],
-    skills = [],
-    languages = [],
-    projects = [],
-    certifications = [],
-    references = [],
-  } = resumeData || {};
-
   const dummyData = {
     personalInfo: {
-      fullName: "John Doe",
-      title: "Frontend Developer",
+      fullName: "JOHN DOE",
+      jobTitle: "Frontend Developer",
       email: "john.doe@email.com",
-      phone: "+234 800 000 0000",
-      location: "Lagos, Nigeria",
+      phone: "+1 (234) 567-8901",
+      location: "New York, USA",
       linkedin: "linkedin.com/in/johndoe",
       portfolio: "johndoe.dev",
     },
     professionalSummary:
-      "Passionate Frontend Developer with 4+ years of experience building responsive and user-friendly web applications. Skilled in React, Tailwind CSS, and modern JavaScript frameworks.",
+      "Creative and detail-oriented Frontend Developer with 4+ years of experience building responsive and user-friendly web applications. Passionate about crafting clean UI, optimizing performance, and delivering exceptional user experiences.",
     education: [
       {
         degree: "B.Sc. Computer Science",
-        school: "University of Lagos",
-        year: "2019",
+        school: "University of Technology",
+        startDate: "2016",
+        endDate: "2020",
       },
     ],
     experience: [
       {
         jobTitle: "Frontend Developer",
-        company: "Tech Solutions Ltd",
-        location: "Lagos",
+        company: "Tech Solutions Inc.",
+        location: "New York, USA",
         startDate: "2021",
         endDate: "Present",
         description:
-          "Developed and maintained responsive web applications using React and Tailwind CSS. Improved website performance by 30%.",
+          "Developed and maintained scalable React applications, improved website performance by 30%, and collaborated with cross-functional teams to deliver high-quality digital products.",
+      },
+      {
+        jobTitle: "Junior Web Developer",
+        company: "Creative Studio",
+        location: "Remote",
+        startDate: "2020",
+        endDate: "2021",
+        description:
+          "Built responsive landing pages and implemented modern UI components using React and Tailwind CSS while ensuring cross-browser compatibility.",
       },
     ],
-    skills: ["React", "JavaScript", "Tailwind CSS", "Firebase", "UI/UX"],
-    languages: ["English - Fluent", "Yoruba - Native"],
+    skills: ["React", "JavaScript", "Tailwind CSS", "HTML", "CSS", "Git"],
+    languages: [
+      { name: "English", level: "Fluent" },
+      { name: "Spanish", level: "Intermediate" },
+    ],
     projects: [
       {
         title: "E-commerce Website",
         description:
-          "Built a fully responsive e-commerce platform with cart and payment integration.",
-        link: "github.com/johndoe/ecommerce",
+          "Developed a full-featured e-commerce platform with product filtering, cart system, and secure checkout integration.",
+        link: "https://ecommerce-demo.com",
+      },
+      {
+        title: "Portfolio Website",
+        description:
+          "Designed and developed a personal portfolio showcasing projects, blogs, and contact integration.",
+        link: "https://johndoe.dev",
       },
     ],
     certifications: [
-      { name: "Google UX Design Certificate", year: "2022" },
+      { name: "Frontend Web Development", year: "2022" },
+      { name: "React Advanced Concepts", year: "2023" },
     ],
     references: [
-      { name: "Jane Smith", phone: "+234 900 000 0000" },
+      {
+        name: "Jane Smith",
+        position: "Project Manager",
+        company: "Tech Solutions Inc.",
+        contact: "jane.smith@email.com",
+      },
     ],
   };
 
   const finalData = {
     personalInfo:
-      Object.keys(personalInfo).length > 0
-        ? personalInfo
-        : dummyData.personalInfo,
+      resumeData?.personalInfo?.fullName ? resumeData.personalInfo : dummyData.personalInfo,
     professionalSummary:
-      professionalSummary || dummyData.professionalSummary,
-    education: education.length > 0 ? education : dummyData.education,
-    experience: experience.length > 0 ? experience : dummyData.experience,
-    skills: skills.length > 0 ? skills : dummyData.skills,
-    languages: languages.length > 0 ? languages : dummyData.languages,
-    projects: projects.length > 0 ? projects : dummyData.projects,
+      resumeData?.professionalSummary || dummyData.professionalSummary,
+    education:
+      resumeData?.education?.length > 0 ? resumeData.education : dummyData.education,
+    experience:
+      resumeData?.experience?.length > 0 ? resumeData.experience : dummyData.experience,
+    skills:
+      resumeData?.skills?.length > 0 ? resumeData.skills : dummyData.skills,
+    languages:
+      resumeData?.languages?.length > 0 ? resumeData.languages : dummyData.languages,
+    projects:
+      resumeData?.projects?.length > 0 ? resumeData.projects : dummyData.projects,
     certifications:
-      certifications.length > 0
-        ? certifications
+      resumeData?.certifications?.length > 0
+        ? resumeData.certifications
         : dummyData.certifications,
     references:
-      references.length > 0 ? references : dummyData.references,
+      resumeData?.references?.length > 0
+        ? resumeData.references
+        : dummyData.references,
   };
 
   return (
-    <div className="w-[794px] min-h-[1123px] bg-white shadow-lg text-gray-800 font-serif p-12">
-
-      {/* HEADER */}
-      <div className="text-center mb-8">
+    <div className="resume-container print-container bg-white text-gray-800 font-serif pt-0 p-12">
+      <div className="text-center mb-8 resume-section">
         <h1 className="text-3xl tracking-[6px] font-light uppercase">
-          {finalData.personalInfo.fullName || dummyData.personalInfo.fullName}
+          {finalData.personalInfo.fullName}
         </h1>
 
-        <p className="text-xs tracking-[4px] text-gray-500 mt-2 uppercase">
-          {finalData.personalInfo.title || dummyData.personalInfo.title}
+        <p className="text-xs tracking-[4px] text-gray-500 uppercase">
+          {finalData.personalInfo.jobTitle}
         </p>
 
         <div className="border-t border-gray-300 mt-6"></div>
       </div>
 
       <div className="grid grid-cols-3 gap-10">
-
- 
         <div className="col-span-1 space-y-8">
-
-          <div>
+          <div className="resume-section">
             <SectionTitle>Contact</SectionTitle>
-            <div className="text-xs space-y-2 leading-relaxed">
-              <p>{finalData.personalInfo.email || dummyData.personalInfo.email}</p>
-              <p>{finalData.personalInfo.phone || dummyData.personalInfo.phone}</p>
-              <p>{finalData.personalInfo.location || dummyData.personalInfo.location}</p>
-              <p>{finalData.personalInfo.linkedin || dummyData.personalInfo.linkedin}</p>
-              <p>{finalData.personalInfo.portfolio || dummyData.personalInfo.portfolio}</p>
+            <div className="text-xs space-y-1 leading-relaxed">
+              <p>{finalData.personalInfo.email}</p>
+              <p>{finalData.personalInfo.phone}</p>
+              <p>{finalData.personalInfo.location}</p>
+              <p>{finalData.personalInfo.linkedin}</p>
+              <p>{finalData.personalInfo.portfolio}</p>
             </div>
           </div>
 
-          <div>
+          <div className="resume-section">
             <SectionTitle>Education</SectionTitle>
             <div className="text-xs space-y-4">
               {finalData.education.map((edu, index) => (
                 <div key={index}>
-                  <p className="font-semibold">{edu.degree}</p>
-                  <p className="italic">{edu.school}</p>
-                  <p className="text-gray-500">{edu.year}</p>
+                  <p>
+                    <b>{edu.degree}</b>
+                  </p>
+                  <p className="text-gray-600">{edu.school}</p>
+                  <p className="italic text-gray-500">
+                    {edu.startDate} - {edu.endDate}
+                  </p>
                 </div>
               ))}
             </div>
           </div>
 
-          <div>
+          <div className="resume-section">
             <SectionTitle>Skills</SectionTitle>
             <ul className="text-xs space-y-1 list-disc list-inside">
               {finalData.skills.map((skill, index) => (
@@ -144,16 +161,18 @@ const TemplateElegant = () => {
             </ul>
           </div>
 
-          <div>
+          <div className="resume-section">
             <SectionTitle>Languages</SectionTitle>
             <ul className="text-xs space-y-1">
               {finalData.languages.map((lang, index) => (
-                <li key={index}>{lang}</li>
+                <li key={index}>
+                  {lang.name || lang} {lang.level && `- ${lang.level}`}
+                </li>
               ))}
             </ul>
           </div>
 
-          <div>
+          <div className="resume-section">
             <SectionTitle>Certifications</SectionTitle>
             <ul className="text-xs space-y-2">
               {finalData.certifications.map((cert, index) => (
@@ -163,20 +182,17 @@ const TemplateElegant = () => {
               ))}
             </ul>
           </div>
-
         </div>
 
-        {/* RIGHT CONTENT */}
         <div className="col-span-2 space-y-10">
-
-          <div>
+          <div className="resume-section">
             <SectionTitle>Profile Summary</SectionTitle>
             <p className="text-sm leading-relaxed text-gray-700">
               {finalData.professionalSummary}
             </p>
           </div>
 
-          <div>
+          <div className="resume-section">
             <SectionTitle>Work Experience</SectionTitle>
             <div className="space-y-6">
               {finalData.experience.map((exp, index) => (
@@ -197,7 +213,7 @@ const TemplateElegant = () => {
             </div>
           </div>
 
-          <div>
+          <div className="resume-section">
             <SectionTitle>Projects</SectionTitle>
             <div className="space-y-4">
               {finalData.projects.map((project, index) => (
@@ -206,24 +222,27 @@ const TemplateElegant = () => {
                   <p className="text-sm text-gray-700">
                     {project.description}
                   </p>
-                  <p className="italic text-[10px]">{project.link}</p>
+                  {project.link && (
+                    <p className="italic text-[10px]">{project.link}</p>
+                  )}
                 </div>
               ))}
             </div>
           </div>
 
-          <div>
+          <div className="resume-section">
             <SectionTitle>References</SectionTitle>
             <div className="space-y-3">
               {finalData.references.map((ref, index) => (
                 <div key={index}>
                   <p className="text-sm font-semibold">{ref.name}</p>
-                  <p className="text-sm text-gray-600">{ref.phone}</p>
+                  <p>{ref.position}</p>
+                  <p>{ref.company}</p>
+                  <p className="text-sm text-gray-600">{ref.contact}</p>
                 </div>
               ))}
             </div>
           </div>
-
         </div>
       </div>
     </div>
